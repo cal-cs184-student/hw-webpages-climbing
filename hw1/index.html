@@ -28,20 +28,20 @@
 	<body>
 		<div class="container">
 		<h1>CS184/284A Spring 2025 Homework 1 Write-Up</h1>
-		<div style="text-align: center;">Names: </div>
+		<div style="text-align: center;">Names: Nicole Cheng, Steffi Lin</div>
 
 		<br>
 
-		Link to webpage: (TODO) <a href="https://cs184.eecs.berkeley.edu/sp25">cs184.eecs.berkeley.edu/sp25</a>
+		Link to webpage: (TODO) <a href="https://steffilin.github.io/cs184portfolio/">https://steffilin.github.io/cs184portfolio/</a>
 		
 		<br>
 
 		Link to GitHub repository: (TODO) <a href="https://cs184.eecs.berkeley.edu/sp25">cs184.eecs.berkeley.edu/sp25</a>
 
-		<figure>
-			<img src="lion.jpg" alt="Lion" style="width:50%"/>
+		<!-- <figure>
+			<img src="images/image1.png" alt="Lion" style="width:50%"/>
 			<figcaption>You can add images with captions!</figcaption>
-		</figure>
+		</figure> -->
 
 		<!--
 		We've already added one heading per task, to make your write-up as navigable when grading. Please fit your write-up within these sections!
@@ -51,48 +51,219 @@
 		Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
 
 		<h2>Task 1: Drawing Single-Color Triangles</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		We first calculate the two corners defining the bounding box for the triangle by taking the (minX, minY) and (maxX, maxY). We then check for clockwise or counterclockwise winding order using the right-hand rule. To do this, we calculate two vectors starting from one vertex, then take the cross product of them. If the result is negative, the points are in clockwise order, else they are in counterclockwise order. After we determine the winding order, we loop through all the points (center of pixel using +0.5, +0.5) inside the bounding box and check whether it’s inside our triangle. We only loop through all the points in the bounding box once, therefore our algorithm is no worse than one that checks each sample within the bounding box of the triangle. We created a helper function for this that basically takes a point and 3 triangle points (passed-in in counterclockwise order) and does three line tests. If all 3 turn up >= 0, the point is inside the triangle or on the boundary, else it’s outside. Then we call <code>fill_pixel()</code> on the points inside the triangle using the given color.
 
-		<p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
+        <figure>
+			<img src="images/image1.png" alt="image1" style="width:50%"/>
+			<!-- <figcaption>You can add images with captions!</figcaption> -->
+		</figure>
+        
+		<!-- <p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 			  <tr>
 				<td style="text-align: center;">
-				  <img src="lion.jpg" width="400px"/>
+				  <img src="images/image1.png" width="400px"/>
 				  <figcaption>Caption goes here.</figcaption>
 				</td>
 				<td style="text-align: center;">
-				  <img src="lion.jpg" width="400px"/>
+				  <img src="images/image2.png" width="400px"/>
 				  <figcaption>Caption goes here.</figcaption>
 				</td>
 			  </tr>
 			  <tr>
 				<td style="text-align: center;">
-				  <img src="lion.jpg" width="400px"/>
+				  <img src="images/image3.png" width="400px"/>
 				  <figcaption>Caption goes here.</figcaption>
 				</td>
 				<td style="text-align: center;">
-				  <img src="lion.jpg" width="400px"/>
+				  <img src="images/image4.png" width="400px"/>
 				  <figcaption>Caption goes here.</figcaption>
 				</td>
 			  </tr>
 			</table>
-		</div>
+		</div> -->
 		
 		<h2>Task 2: Antialiasing by Supersampling</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<p>We modified <code>rasterize_triangle()</code> to instead of sampling once every pixel, we sample sqrt(sample_rate) * sqrt(sample_rate) times per pixel. To calculate the position within a single pixel, we do this calculation: <code>(x + (xi + 0.5) * increment, y + (yi + 0.5) * increment) </code> where xi and yi are values indicating the (xi, yi) position within the pixel. We scale this down by setting <code>increment = 1.0 / sqrt(this->sample_rate)</code>.We use the same helper function that does 3 line tests to determine if the sample is within the triangle. If it is, we set the corresponding sample_buffer index to be the color. Sample_buffer has a size of <code>width * height * sample_rate</code>. Each pixel (x, y) is represented by the range of indices <code>((width * y + x) * sample_rate</code> to <code>(width * y + x) * sample_rate + sample_rate)</code>. When <code>resolve_to_framebuffer()</code> is called, we then downsample back down to the original number of pixels by averaging the colors in the corresponding sample_buffer indices that make up 1 whole pixel. To do this, we start with rgb(0,0,0). We then add the colors in the corresponding pixel from sample_buffer to this rgb value. After we have looped through the whole pixel, we average the value by dividing by the sample_rate.</p>
+
+        <p>
+            This supersampling is useful because it allows us to get rid of jaggies (antialiasing)! Instead of only sampling once per pixel, we can sample multiple times and take the average color value of that pixel to create a smoother effect.
+        </p>
+
+        <!-- <p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p> -->
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="images/task2-1.png" width="400px"/>
+				  <figcaption>Sample rate 1: You can see that the colors are very solid, with each pixel at 100% opacity. This creates the jagged effect.</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="images/task2-4.png" width="400px"/>
+				  <figcaption>Sample rate 4: Image is starting the blur a little. In theory, you should be able to see 4 different opacity values for each color triangle because since we are sampling 4 times per pixel, there are 4 possible values per color. </figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="images/task2-16.png" width="400px"/>
+				  <figcaption>Sample rate 16: The most blurred edges out of all the images since we are sampling the most times.</figcaption>
+				</td>
+				<!-- <td style="text-align: center;">
+				  <img src="images/image4.png" width="400px"/>
+				  <figcaption>Caption goes here.</figcaption>
+				</td> -->
+			  </tr>
+			</table>
+		</div>
+        
 
 		<h2>Task 3: Transforms</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		Cubeman is star-jumping to show joy and excitement! We changed his color to be warm orange to express more joy!! To do this, we slightly unrotated his head, and then rotated his left and right legs by 45 and -45 degrees respectively.
+
+        <figure>
+			<img src="images/task3.png" alt="image1" style="width:50%"/>
+			<!-- <figcaption>You can add images with captions!</figcaption> -->
+		</figure>
 
 		<h2>Task 4: Barycentric coordinates</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		Barycentric coordinates represent a point as a linear combination of a triangle’s vertices. They represent the point in terms of weights for each of the 3 vertices. These weights correspond to how much each vertex contributes to the position of the point. The sum of the three weights always equals 1. If a point is closer to one vertex, its weight for that vertex will be larger. In computer graphics, we can use barycentric coordinates to take the colors at 3 vertices and blend them together to form a gradient by making hybrid colors at each point inside the triangle. 
+
+        <div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="images/task4-lecture.png" width="400px"/>
+				  <figcaption>We represent the barycentric coordinates of a point (x, y) to be (&alpha;, &beta;, &gamma;) as shown in the lecture slide</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="images/task4-circle.png" width="400px"/>
+				  <figcaption> </figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="images/task4-triangle.png" width="400px"/>
+				  <figcaption>The triangle has red, green, and blue vertices. We can see how the colors blend together and get stronger near the vertices.</figcaption>
+				</td>
+				<!-- <td style="text-align: center;">
+				  <img src="images/image4.png" width="400px"/>
+				  <figcaption>Caption goes here.</figcaption>
+				</td> -->
+			  </tr>
+			</table>
+		</div>
 
 		<h2>Task 5: "Pixel sampling" for texture mapping</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		Pixel sampling is when you approximate a color of a pixel while keeping the texture in 
+		mind (3D surface rather than 2D). Because when we’re switching from screen space to texture space, 
+		the sampling rate changes often and isn’t constant. With magnification and minification, we need to 
+		apply different methods of texture filtering. Essentially, we took points on the unit uv space and 
+		converted them as points in the texture space, rather than a color, to map onto our world space, 
+		resulting in the final screen space. Similar to Task 4 with the implementation of barycentric coordinates 
+		in our rasterize_interpolated_color_triangle function, we replaced the color object with a texture color 
+		point within our tex object. Nearest sampling is when you round to the closest point in the tex map that 
+		corresponds to the current mipmap layer we’re using. Bilinear sampling uses the 4 closest points and implements 
+		linear interpolation to find horizontal and vertical interpolation to get “in-between” values. 
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+					<img src="images/Rate1_Near.png" width="400px"/>
+				  <figcaption>Sample rate 1, Nearest Sampling.</figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="images/Rate1_Bilinear.png" width="400px"/>
+				  <figcaption>Sample rate 1, Bilinear Sampling.</figcaption>
+				  </td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+					<img src="images/Rate16_Near.png" width="400px"/>
+				  	<figcaption>Sample rate 16, Nearest Sampling.</figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="images/Rate16_Bilinear.png" width="400px"/>
+				  <figcaption>Sample rate 16, Bilinear Sampling.</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div> 
 
+		<p> With these 4 images, we can see quite a big jump when we go from a sample rate of 1, nearest sampling, to a sample rate of
+			16 using bilinear sampling. Even between the different sampling methods within the same sampling rate, you can still see how 
+			the nearest sampling is always a bit more aliased than the pixels in the bilinear sampling. It is especially noticeable on high-contrast 
+			areas with high frequencies.
+		</p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+					<img src="images/Beat_Bilinear.png" width="400px"/>
+				  <figcaption>Sample rate 1, Bilinear Sampling.</figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="images/Beat_Near.png" width="400px"/>
+				  <figcaption>Sample rate 1, Nearest Sampling.</figcaption>
+				  </td>
+			  </tr>
+			</table>
+		</div> 
+
+		Notice how the edge of the Berkeley seal is smoother on Bilinear Sampling than the jaggies on the Nearest Sampling.
+		
+		
 		<h2>Task 6: "Level Sampling" with mipmaps for texture mapping</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		Level sampling is used for minification, another type of texture filtering, 
+		when you have the texture mapping of an image, but depending on the location of the image due to 3D 
+		perspective, the sampling rate changes and we try to pick a resolution that most closely corresponds to 
+		that screen sampling rate. This is achieved through mipmaps, and in our implementation, we added on top 
+		of our existing Task 5 code how to choose a layer, different types of sampling depending on the rate/method 
+		we choose, and added the derivative uv values. All of these combined allow us to accurately rasterize the 
+		3D texture onto the screen space.
+
+		<p>The tradeoffs between speed, memory usage, and antialiasing power for number of samples per pixel: 
+			increased samples means decrease speed, increase memory usage, but your antialiasing is much better (due to higher quality sampling). Super-sampling 
+			stores many color values per pixel, leading to memory increase as well.
+		</p>
+		<p>
+			The tradeoffs between speed, memory usage, and antialiasing power for pixel sampling: speed increase in nearest sampling compared
+			to bilinear sampling, as bilinear essentially means finding and sampling 4 points each. However, antialiasing power
+			is better in bilinear as a result. 
+		</p>
+		<p>
+			The tradeoffs between speed, memory usage, and antialiasing power for level sampling: your speed is higher
+			because you use lower resolution layers for lower sampling rate areas of your image. Memory usage is 4/3, and 
+			antialiasing can be "less" effective, because you use lower resolution farther from the image, but overall makes 
+			your image rasterization more accurate overall.
+		</p>
+
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+					<img src="images/L0_PNear.png" width="400px"/>
+				  <figcaption>Sample rate 1, Nearest Sampling, Level 0.</figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="images/L0_PLinear.png" width="400px"/>
+				  <figcaption>Sample rate 1, Bilinear Sampling, Level 0.</figcaption>
+				  </td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+					<img src="images/LNear_PNear.png" width="400px"/>
+				  	<figcaption>Sample rate 1, Nearest Sampling, Nearest Level.</figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="images/LNear_PLinear.png" width="400px"/>
+				  <figcaption>Sample rate 1, Bilinear Sampling, Nearest Level.</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div> 
+
 
 		<h2>(Optional) Task 7: Extra Credit - Draw Something Creative!</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
