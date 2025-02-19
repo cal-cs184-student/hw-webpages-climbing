@@ -32,12 +32,15 @@
 
 		<br>
 
-		Link to webpage: <a href="https://github.com/cal-cs184-student/hw-webpages-climbing">Click Here</a>
+		Link to webpage: <a href="https://cal-cs184-student.github.io/hw-webpages-climbing/">Click Here</a>
 		
 		<br>
 
 		Link to GitHub repository: <a href="https://github.com/cal-cs184-student/sp25-hw1-weloveclimbing">Click Here</a>
 
+		<br>
+		Link to Webpage GitHub repository: <a href="https://github.com/cal-cs184-student/hw-webpages-climbing">Click Here</a>
+		
 		<!-- <figure>
 			<img src="images/image1.png" alt="Lion" style="width:50%"/>
 			<figcaption>You can add images with captions!</figcaption>
@@ -56,13 +59,12 @@
 		Finally, for tasks 5 and 6, we put it all together to rasterize real images smoothly and textured (with accurate perspective)!
 		Now every time we look at a pixelelated image, we can say that we know how to smooth it out!
 		Fun fact: Nicole can never look at pixelated art the same again (so many jaggies).
-		
 
 		<h2>Task 1: Drawing Single-Color Triangles</h2>
 		We first calculate the two corners defining the bounding box for the triangle by taking the (minX, minY) and (maxX, maxY). We then check for clockwise or counterclockwise winding order using the right-hand rule. To do this, we calculate two vectors starting from one vertex, then take the cross product of them. If the result is negative, the points are in clockwise order, else they are in counterclockwise order. After we determine the winding order, we loop through all the points (center of pixel using +0.5, +0.5) inside the bounding box and check whether it’s inside our triangle. We only loop through all the points in the bounding box once, therefore our algorithm is no worse than one that checks each sample within the bounding box of the triangle. We created a helper function for this that basically takes a point and 3 triangle points (passed-in in counterclockwise order) and does three line tests. If all 3 turn up >= 0, the point is inside the triangle or on the boundary, else it’s outside. Then we call <code>fill_pixel()</code> on the points inside the triangle using the given color.
 
         <figure>
-			<img src="images/image1.png" alt="image1" style="width:50%"/>
+			<img src="images/task1.png" alt="image1" style="width:50%"/>
 			<!-- <figcaption>You can add images with captions!</figcaption> -->
 		</figure>
         
@@ -273,7 +275,7 @@
 		</div> 
 
 
-		<h2>(Optional) Task 7: Extra Credit - Draw Something Creative!</h2>
+		<!-- <h2>(Optional) Task 7: Extra Credit - Draw Something Creative!</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 		<h2>Additional Notes (please remove)</h2>
@@ -285,7 +287,7 @@
 					<li>You can write display equations like so: \[ a^2 + b^2 = c^2 \]</li>
 				</ul>
 			</li>
-		</ul>
+		</ul> -->
 		</div>
 	</body>
 </html>
