@@ -32,11 +32,11 @@
 
 		<br>
 
-		Link to webpage: (TODO) <a href="https://steffilin.github.io/cs184portfolio/">https://steffilin.github.io/cs184portfolio/</a>
+		Link to webpage: <a href="https://github.com/cal-cs184-student/hw-webpages-climbing">Click Here</a>
 		
 		<br>
 
-		Link to GitHub repository: (TODO) <a href="https://cs184.eecs.berkeley.edu/sp25">cs184.eecs.berkeley.edu/sp25</a>
+		Link to GitHub repository: <a href="https://github.com/cal-cs184-student/sp25-hw1-weloveclimbing">Click Here</a>
 
 		<!-- <figure>
 			<img src="images/image1.png" alt="Lion" style="width:50%"/>
@@ -48,7 +48,15 @@
 		-->
 
 		<h2>Overview</h2>
-		Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
+		In this homework, we were able to get introduced to the wonderful world of rasterization and antialiasing. 
+		Starting off with task 1 with drawing simple triangles which kicked off our first 
+		image renderings ever! We then moved onto supersampling and antialiasing in task 2 
+		for a bit more complex approach to task 1. These triangles now look smoother with some more samples per pixel, as well as some blurring!
+		Then, we moved onto transforms and barycentric coordinates, which had some cool results as well with Cubeman and color wheel.
+		Finally, for tasks 5 and 6, we put it all together to rasterize real images smoothly and textured (with accurate perspective)!
+		Now every time we look at a pixelelated image, we can say that we know how to smooth it out!
+		Fun fact: Nicole can never look at pixelated art the same again (so many jaggies).
+		
 
 		<h2>Task 1: Drawing Single-Color Triangles</h2>
 		We first calculate the two corners defining the bounding box for the triangle by taking the (minX, minY) and (maxX, maxY). We then check for clockwise or counterclockwise winding order using the right-hand rule. To do this, we calculate two vectors starting from one vertex, then take the cross product of them. If the result is negative, the points are in clockwise order, else they are in counterclockwise order. After we determine the winding order, we loop through all the points (center of pixel using +0.5, +0.5) inside the bounding box and check whether it’s inside our triangle. We only loop through all the points in the bounding box once, therefore our algorithm is no worse than one that checks each sample within the bounding box of the triangle. We created a helper function for this that basically takes a point and 3 triangle points (passed-in in counterclockwise order) and does three line tests. If all 3 turn up >= 0, the point is inside the triangle or on the boundary, else it’s outside. Then we call <code>fill_pixel()</code> on the points inside the triangle using the given color.
